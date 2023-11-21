@@ -4,6 +4,10 @@ from .models import Cliente, Carro
 import re
 from django.core import serializers
 import json
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+from django.shortcuts import redirect, get_object_or_404
+
 
 def clientes(request):
     if request.method == "GET":
@@ -44,6 +48,62 @@ def clientes(request):
 
 def att_cliente(request):
     id_cliente = request.POST.get('id_cliente')
+
     cliente = Cliente.objects.filter(id=id_cliente)
+    carros = Carro.objects.filter(cliente=cliente[0])
+
     cliente_json = json.loads(serializers.serialize('json', cliente))[0]['fields']
-    return JsonResponse(cliente_json)
+    carros_json = json.loads(serializers.serialize('json', carros))
+    carros_json = [{'fields': i['fields'], 'id': i['pk']} for i in carros_json]
+    cliente_id = json.loads(serializers.serialize('json', cliente))[0]['pk']
+    data = {'cliente': cliente_json, 'carros': carros_json, 'cliente_id': cliente_id}
+    return JsonResponse(data)
+
+
+def excluir_carro(request, id):
+    try:
+        carro = Carro.objects.get(id=id)
+        carro.delete()
+        return redirect(reverse('clientes')+f'?aba=att_cliente&id_cliente={id}')
+    except:
+        return redirect(reverse('clientes')+f'?aba=att_cliente&id_cliente={id}')
+
+
+@csrf_exempt
+def update_carro(request, id):
+    nome_carro = request.POST.get('carro')
+    placa = request.POST.get('placa')
+    ano = request.POST.get('ano')
+
+    carro = Carro.objects.get(id=id)
+    list_carros = Carro.objects.exclude(id=id).filter(placa=placa)
+
+    if list_carros.exists():
+        return HttpResponse('Placa já existente')
+
+    carro.carro = nome_carro
+    carro.placa = placa
+    carro.ano = ano
+    carro.save()
+
+    return HttpResponse(id)
+
+
+def update_cliente(request, id):
+    body = json.loads(request.body)
+
+    nome = body['nome']
+    sobrenome = body['sobrenome']
+    email = body['email']
+    cpf = body['cpf']
+
+    cliente = get_object_or_404(Cliente, id=id)
+    try:
+        cliente.nome = nome
+        cliente.sobrenome = sobrenome
+        cliente.email = email
+        cliente.cpf = cpf
+        cliente.save()
+        return JsonResponse({'status': '200', 'nome': nome, 'sobrenome': sobrenome, 'email': email, 'cpf': cpf})
+    except:
+        return JsonResponse({'status': '500'})
