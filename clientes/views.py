@@ -6,7 +6,7 @@ from django.core import serializers
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render, HttpResponseRedirect, reverse
 
 
 def clientes(request):
@@ -43,7 +43,7 @@ def clientes(request):
             car = Carro(carro=carro, placa=placa, ano=ano, cliente=cliente)
             car.save()
 
-        return HttpResponse('Teste')
+        return HttpResponseRedirect(reverse('novo_servico'))
 
 
 def att_cliente(request):

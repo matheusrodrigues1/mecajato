@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render, HttpResponseRedirect, reverse
 from .forms import FormServico
 from django.http import HttpResponse, FileResponse
 from .models import Servico
@@ -14,7 +14,7 @@ def novo_servico(request):
 
         if form.is_valid():
             form.save()
-            return HttpResponse('Salvo com sucesso')
+            return HttpResponseRedirect(reverse('novo_servico'))
         else:
             return render(request, 'novo_servico.html', {'form': form})
 
