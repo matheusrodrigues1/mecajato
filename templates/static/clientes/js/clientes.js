@@ -63,7 +63,6 @@ function dados_cliente(){
       div_carros.innerHTML = ""
 
       for(i=0; i<data['carros'].length; i++){
-        console.log(data['carros'][i])
         div_carros.innerHTML += "\<form action='/clientes/update_carro/" + data['carros'][i]['id'] +"' method='POST'>\
             <div class='row'>\
                     <div class='col-md'>\

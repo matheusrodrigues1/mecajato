@@ -4,7 +4,6 @@
 {% block 'head' %}
     <link rel="stylesheet" href="{% static 'clientes/css/clientes.css' %}">
 {% endblock %}
-
 {% block 'dashboard' %}
 <div class="container">
     <div class="row">
@@ -16,7 +15,6 @@
             <p class="text-card">Atualizar cliente</p>
         </div>
     </div>
-
     <div id="adicionar-cliente" class="adicionar-cliente">
       <form action="{% url 'clientes' %}" method="POST">{% csrf_token %}
           <div class="row">
